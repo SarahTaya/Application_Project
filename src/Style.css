@@ -1,0 +1,18 @@
+/* English Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+/* Arabic Fonts (عندك جاهزين) */
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&family=Big+Shoulders:opsz,wght@10..72,100..900&family=Cairo:wght@200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Changa:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap');
+
+/* Global Reset */
+* {
+  font-family: 'Poppins', sans-serif;   /* اختر الخط يلي بدك ياه */
+  overflow: hidden;
+}
