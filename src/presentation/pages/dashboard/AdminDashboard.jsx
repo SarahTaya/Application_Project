@@ -27,16 +27,20 @@ export default function AdminDashboard() {
     return await getComplaintsByStatuse(status);
   }
 
-  return (
-    <div>
+    return (
+    <div className="admin-page">
       <AdminNavBar />
-    <ComplaintsDashboardBase
-      pageTitle="لوحة تحكم الأدمن"
-      pageSubtitle="عرض وإدارة جميع الشكاوي للجهة الحكومية"
-      loadInitialComplaints={loadInitialComplaints}
-      loadByReference={loadByReference}
-      loadByStatus={loadByStatus}
-      employeeId={ADMIN_ID}
-    /></div>
+
+      <div className="admin-maindash">
+        <ComplaintsDashboardBase
+          pageTitle="لوحة تحكم الأدمن"
+          pageSubtitle="عرض وإدارة جميع الشكاوي للجهة الحكومية"
+          loadInitialComplaints={loadInitialComplaints}
+          loadByReference={loadByReference}
+          loadByStatus={loadByStatus}
+          employeeId={ADMIN_ID}
+        />
+      </div>
+    </div>
   );
 }

@@ -1,9 +1,9 @@
 import { httpClient } from "../http/client";
 
 export async function getComplaintsByDepartment(departmentId) {
-    const res= await httpClient.get(`complaints/department/${departmentId}`);
-    
-    return res.data;
+  const res = await httpClient.get(`complaints/department/${departmentId}`);
+
+  return res.data;
 }
 
 
@@ -14,25 +14,24 @@ export async function getComplaintByReferenceApi(reference) {
 }
 
 
-export async function getComplaintsByStatuseApi(status) 
-{
-const res=await httpClient.get(`complaints/status/${status}`); 
-return res.data; 
+export async function getComplaintsByStatuseApi(status) {
+  const res = await httpClient.get(`complaints/status/${status}`);
+  return res.data;
 }
 
-export async function getNotesByComplaintIdApi(complaintId) 
-{
-const res=await httpClient.get(`get/note/${complaintId}`); 
-return res.data; 
+export async function getNotesByComplaintIdApi(complaintId) {
+  const res = await httpClient.get(`get/note/${complaintId}`);
+  return res.data;
 }
 
 export async function deleteNoteApi(noteId) {
   // إذا عندكم بالباك إند الطريقة DELETE:
   const res = await httpClient.get(`delete/note/${noteId}`);
-  return res.data;}
+  return res.data;
+}
 //اضافة ملاحظة
-export async function addEmployeeNoteApi({ complaintId, note, requested_to_citizen }){
-  const res=await httpClient.post("/add/note", {
+export async function addEmployeeNoteApi({ complaintId, note, requested_to_citizen }) {
+  const res = await httpClient.post("/add/note", {
     complaintId,
     note,
     requested_to_citizen,
@@ -52,8 +51,8 @@ export async function updateComplaintStatusApi({ complaint_id, status }) {
 }
 ///////////////////Adminnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
 // جلب شكاوي جهة حكومية معيّنة
-export async function getComplaintsByEntityApi(entityId) {
-  const res = await httpClient.get(`complaints/entity/${entityId}`);
+export async function getComplaintsByEntityApi() {
+  const res = await httpClient.get("allComplaints");
   return res.data; // { status, complaints: [...] }
 }
 
@@ -84,3 +83,24 @@ export async function finishComplaintProcessApi(referenceNumber) {
   });
   return res.data;
 }
+
+//تعديل///////
+// export   async function updateNoteApi({ note_id, note }) {
+//   const res = await httpClient.post("/update/note", { note_id, note });
+//   return res.data;
+// }
+
+export async function updateNoteApi({ note_id, note }) {
+  const formData = new FormData();
+  formData.append("note_id", note_id);
+  formData.append("note", note);
+
+  const res = await httpClient.post("/update/note", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return res.data;
+}
+

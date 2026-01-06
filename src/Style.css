@@ -16,3 +16,6 @@
   font-family: 'Poppins', sans-serif;   /* اختر الخط يلي بدك ياه */
   overflow: hidden;
 }
+html, body, #root { height: 100%; }
+body { margin: 0; }
+

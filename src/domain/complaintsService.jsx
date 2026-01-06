@@ -169,6 +169,7 @@ import {
   finishComplaintProcessApi,
   addEmployeeNoteApi,
   updateComplaintStatusApi,
+  updateNoteApi,
 } from "../data/dash/dashApi";
 
 function mapComplaint(item) {
@@ -183,9 +184,11 @@ function mapComplaint(item) {
     location: item.location,
     description: item.description,
     departmentId: item.department_id ?? item.government_entity_id ?? "",
+    departmentName: item.department?.name ??  "rrr",
     date: item.created_at ? item.created_at.slice(0, 10) : "",
     files: item.files ?? [],
     notes: item.notes ?? [],
+     
     raw: item,
 
     lockedBy: item.locked_by ?? null,
@@ -261,12 +264,27 @@ export async function deleteNote(noteId) {
   return data;
 }
 
-// ========== شكاوي الجهة الحكومية (للأدمن) ==========
-export async function getComplaintsByEntity(entityId) {
-  const data = await getComplaintsByEntityApi(entityId);
-  console.log("DATA FROM API (entity) =", data);
+//تعديل/////
+export async function updateNote({ noteId, noteText }) {
+  const data = await updateNoteApi({ note_id: noteId, note: noteText });
 
-  const list = Array.isArray(data.complaints) ? data.complaints : [];
+  // حسب صورة Postman: data.data هو النوت المعدلة
+  const updated = data?.data?.data ?? data?.data ?? null;
+  if (!updated) throw new Error("Update note response invalid");
+
+  return mapNote(updated);
+}
+
+
+
+// ========== شكاوي الجهة الحكومية (للأدمن) ==========
+export async function getComplaintsByEntity() {
+  const data = await getComplaintsByEntityApi();
+  console.log("DATA FROM API (all entity) =", data);
+
+  // const list = Array.isArray(data.complaints) ? data.complaints : [];
+  // return list.map(mapComplaint);
+  const list = Array.isArray(data.data) ? data.data : [];
   return list.map(mapComplaint);
 }
 
@@ -275,14 +293,23 @@ export async function startComplaintProcess(referenceNumber) {
   const data = await startComplaintProcessApi(referenceNumber);
   console.log("DATA FROM API (startProcess) =", data);
 
-  const item = data.complaint ?? data;
-  return mapComplaint(item);
+  // const item = data.complaint ?? data;
+  
+   const item =
+    data?.complaint?.complaint ??   // الشكل المتداخل
+    data?.complaint ??              // شكل ثاني محتمل
+    data;  
+     return mapComplaint(item);
 }
 
 export async function finishComplaintProcess(referenceNumber) {
   const data = await finishComplaintProcessApi(referenceNumber);
   console.log("DATA FROM API (finishProcess) =", data);
 
-  const item = data.complaint ?? data;
-  return mapComplaint(item);
+  // const item = data.complaint ?? data;
+  const item =
+    data?.complaint?.complaint ??   // ✅ هذا المطلوب لريسبونسك
+    data?.complaint ??
+    data;
+   return mapComplaint(item);
 }

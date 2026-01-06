@@ -4,6 +4,15 @@
   display: flex;
   flex-direction: column;
 }
+.admin-page{ height:100vh; display:flex; flex-direction:column; min-height:0; }
+.admin-maindash{ flex:1; min-height:0; }
+
+/* override للـ maindash داخل الأدمن */
+.admin-maindash .maindash{
+  height: 100%;
+}
+
+
 
 .title {
   height: 20%;
@@ -29,34 +38,48 @@
 
 .complaint {
   height: 80%;
-  background-color: #f7f1e8;
+  /* background-color: #f7f1e8; */
+  background-color: var(--beige-100);
   display: flex;
   flex-direction: row;
+   min-height: 0;
 
 }
 
 
 .table-filter {
-  width: 70%;
+  /* width: 70%;
+  flex: 1; */
+  flex: 1.1;         /* خلي الجدول ياخد الباقي */
+  width: auto; 
   background-color: #f7f1e8;
   display: flex;
   flex-direction: column;
   margin-right: 10px;
+   min-height: 0;
   height: 100%;
 
 }
 
 .detail-complaints {
-  width: 28%;
+  text-align: center;
+  width: 30%;
   margin-left: 5px;
+   flex: 0 0 550px;
+  min-height: 0;
   overflow-y: auto;
 
 
 }
+
+
+
+
 /* شريط الفلاتر */
 .filters-area {
   height: 20%;
   direction: rtl;
+  flex: 0 0 auto;
   /* لأنك عربي */
   display: flex;
   flex-wrap: wrap;
@@ -82,7 +105,10 @@
 
 }
 .table-wrapper {
-  max-height: 700px;   /* انتي حددي الارتفاع اللي بناسبك */
+  flex: 1;
+  flex: 1 1 auto;
+  max-height: 700px; 
+   min-height: 0;  /* انتي حددي الارتفاع اللي بناسبك */
   overflow-y: auto;    /* هي اللي بتعمل السكروول */
   border-radius: 12px;
   background: white;
@@ -189,13 +215,13 @@
   justify-content: center;
 
   font-size: 40px;
-  color: #5a3410;
+  color: #5a3410;text-align: center;
 }
 
 .detail-ref {
   margin: 0;
   font-size: 20px;
-  color: #8b5a2b;
+  color: #8b5a2b;text-align: center;
 }
 
 .detail-citizen {
@@ -203,6 +229,7 @@
   margin: 4px 0 10px;
   font-weight: 600;
   color: #3c2a1a;
+  text-align: center;
 }
 
 .detail-divider {
@@ -263,12 +290,16 @@
 }
 
 .section-title {
+  text-align: center;
+  
+  justify-content: center;
   font-size: 23px;
   margin-bottom: 4px;
   color: #5a3410;
 }
 
 .section-text {
+  
   font-size: 18px;
   line-height: 1.6;
   color: #4a3b2a;
@@ -336,7 +367,9 @@
 
 /* ................. */
 .notes-header {
+
   display: flex;
+  direction: rtl;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
@@ -801,3 +834,63 @@
   color: #6b5a4a;
 }
 
+
+
+
+
+
+.note-edit-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  margin-inline: 6px;
+  font-size: 16px;
+}
+
+.note-edit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* ////////////////////////////////////////////////////////////////// */
+
+.attachments-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.img-card{
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #edd5b3;
+  background: #fff;
+}
+
+.img-card img{
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.pdf-card, .file-card{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 140px;
+  border-radius: 12px;
+  border: 1px solid #edd5b3;
+  background: #fff;
+  text-decoration: none;
+  color: #6b5a4a;
+}
+
+.pdf-badge{
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f3e7d6;
+  font-weight: 700;
+}

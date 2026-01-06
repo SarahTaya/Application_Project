@@ -108,7 +108,7 @@ export default function AddEmployeePage() {
 
     return (
         <div className="emp-add-page">
-            <AdminNavBar />
+          
 
             <main className="emp-add-main" dir="rtl">
                 {/* الهيدر فوق الكرت */}

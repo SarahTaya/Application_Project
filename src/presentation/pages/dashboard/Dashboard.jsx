@@ -12,6 +12,10 @@ import {
   addEmployeeNote,
   updateComplaintStatus,
 } from "../../../domain/complaintsService";
+import { FaEdit } from "react-icons/fa";
+import { updateNote } from "../../../domain/complaintsService";
+
+
 
 export default function Dashboard() {
   const [complaints, setComplaints] = useState([]);
@@ -27,6 +31,11 @@ export default function Dashboard() {
   const [requestedToCitizen, setRequestedToCitizen] = useState(false);
   const [statusDraft, setStatusDraft] = useState("");
 
+  const [isEditNoteOpen, setIsEditNoteOpen] = useState(false);
+const [editNoteId, setEditNoteId] = useState(null);
+const [editNoteText, setEditNoteText] = useState("");
+
+
   const EMPLOYEE_ID = Number(localStorage.getItem("employee_id") || 0);
   const USER_ID = Number(localStorage.getItem("user_id") || 0);
   const DEPARTMENT_ID = localStorage.getItem("department_id");
@@ -34,6 +43,61 @@ export default function Dashboard() {
   console.log("EMPLOYEE_ID =", EMPLOYEE_ID);
   console.log("USER_ID =", USER_ID);
   console.log("DEPARTMENT_ID from localStorage =", DEPARTMENT_ID);
+
+function openEditNoteModal(note) {
+  if (!canEditSelected) {
+    alert("لا يمكنك تعديل الملاحظات قبل بدء المعالجة.");
+    return;
+  }
+  setEditNoteId(note.id);
+  setEditNoteText(note.text || "");
+  setIsEditNoteOpen(true);
+}
+
+function closeEditNoteModal() {
+  setIsEditNoteOpen(false);
+  setEditNoteId(null);
+  setEditNoteText("");
+}
+
+async function handleSubmitEditNote(e) {
+  e.preventDefault();
+  if (!editNoteId) return;
+
+  try {
+    setLoading(true);
+    setError("");
+
+    const updated = await updateNote({
+      noteId: editNoteId,
+      noteText: editNoteText,
+    });
+
+    // 1) إذا نحن بوضع "all" عدّل allNotes مباشرة
+    setAllNotes((prev) =>
+      prev.map((n) => (n.id === updated.id ? { ...n, text: updated.text } : n))
+    );
+
+    // 2) عدّل selectedComplaint.notes (لأن "mine" مبني عليها)
+    setSelectedComplaint((prev) => {
+      if (!prev) return prev;
+      const updatedNotes = (prev.notes || []).map((n) =>
+        n.id === updated.id ? { ...n, note: updated.text } : n
+      );
+      return { ...prev, notes: updatedNotes };
+    });
+
+    closeEditNoteModal();
+  } catch (err) {
+    console.error(err);
+    alert("فشل تعديل الملاحظة، جرّب مرة تانية.");
+  } finally {
+    setLoading(false);
+  }
+}
+
+
+
 
   function openAddNoteModal() {
     if (!selectedComplaint) return;
@@ -232,9 +296,19 @@ export default function Dashboard() {
 
       const updated = await startComplaintProcess(selectedComplaint.reference);
 
-      setSelectedComplaint(updated);
-      setStatusDraft(updated.status || statusDraft);
-      setComplaints((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      // setSelectedComplaint(updated);
+      // setStatusDraft(updated.status || statusDraft);
+      // setComplaints((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      const full = await getComplaintByReference(selectedComplaint.reference);
+
+    setSelectedComplaint(full);
+    setStatusDraft(full.status || "");
+    //setComplaints((prev) => prev.map((c) => (c.id === full.id ? full : c)));
+    setComplaints((prev) => {
+  const exists = prev.some((c) => c.id === full.id);
+  return exists ? prev.map((c) => (c.id === full.id ? full : c)) : [full, ...prev];
+});
+
     } catch (err) {
       console.error(err);
       setError("فشل بدء معالجة الشكوى، جرّب مرة أخرى.");
@@ -255,9 +329,19 @@ export default function Dashboard() {
 
       const updated = await finishComplaintProcess(selectedComplaint.reference);
 
-      setSelectedComplaint(updated);
-      setStatusDraft(updated.status || statusDraft);
-      setComplaints((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      // setSelectedComplaint(updated);
+      // setStatusDraft(updated.status || statusDraft);
+      // setComplaints((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      const full = await getComplaintByReference(selectedComplaint.reference);
+
+setSelectedComplaint(full);
+setStatusDraft(full.status || "");
+// setComplaints((prev) => prev.map((c) => (c.id === full.id ? full : c)));
+setComplaints((prev) => {
+  const exists = prev.some((c) => c.id === full.id);
+  return exists ? prev.map((c) => (c.id === full.id ? full : c)) : [full, ...prev];
+});
+
     } catch (err) {
       console.error(err);
       setError("فشل إنهاء معالجة الشكوى، جرّب مرة أخرى.");
@@ -464,7 +548,6 @@ export default function Dashboard() {
               </div>
 
               <div className="detail-section">
-                <h3 className="section-title">تعديل الحالة</h3>
 
                 <select
                   className="filter-select"
@@ -494,7 +577,7 @@ export default function Dashboard() {
                 <div className="detail-item">
                   <span className="detail-label">القسم </span>
                   <span className="detail-value">
-                    {selectedComplaint.departmentId}
+                    {selectedComplaint.departmentName}
                   </span>
                 </div>
                 <div className="detail-item">
@@ -522,8 +605,9 @@ export default function Dashboard() {
 
               {/* الملاحظات */}
               <div className="detail-section">
+                <h3 className="section-title">الملاحظات</h3>
                 <div className="notes-header">
-                  <h3 className="section-title">الملاحظات</h3>
+                  
 
                   <div className="notes-actions">
                     <select
@@ -548,11 +632,49 @@ export default function Dashboard() {
                   </div>
                 </div>
 
+{isEditNoteOpen && (
+  <div className="modal-overlay" onClick={closeEditNoteModal}>
+    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-head">
+        <h3 className="modal-title">تعديل ملاحظة</h3>
+        <button type="button" className="modal-x" onClick={closeEditNoteModal}>
+          ×
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmitEditNote} className="modal-body">
+        <label className="modal-label">ID الملاحظة</label>
+        <input className="modal-input" value={editNoteId ?? ""} disabled />
+
+        <label className="modal-label">نص الملاحظة</label>
+        <textarea
+          className="modal-textarea"
+          value={editNoteText}
+          onChange={(e) => setEditNoteText(e.target.value)}
+          required
+        />
+
+        <div className="modal-actions">
+          <button type="button" className="modal-btn secondary" onClick={closeEditNoteModal}>
+            إلغاء
+          </button>
+          <button type="submit" className="modal-btn primary" disabled={loading}>
+            تأكيد التعديل
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+
+
                 {isAddNoteOpen && (
                   <div className="modal-overlay" onClick={closeAddNoteModal}>
                     <div className="modal-card" onClick={(e) => e.stopPropagation()}>
                       <div className="modal-head">
                         <h3 className="modal-title">إضافة ملاحظة</h3>
+
                         <button type="button" className="modal-x" onClick={closeAddNoteModal}>
                           ×
                         </button>
@@ -611,6 +733,19 @@ export default function Dashboard() {
                           )}
                           {note.createdAt && <span className="note-date">{note.createdAt}</span>}
 
+
+<button
+  type="button"
+  className="note-edit-btn"
+  onClick={(e) => {
+    e.stopPropagation();
+   openEditNoteModal(note);
+  }}
+  disabled={!canEditSelected}
+  title={canEditSelected ? "تعديل الملاحظة" : "لا يمكنك التعديل قبل بدء المعالجة"}
+>
+  <FaEdit />
+</button>
                           <button
                             type="button"
                             className="note-delete-btn"
@@ -639,27 +774,84 @@ export default function Dashboard() {
                 )}
 
                 {selectedComplaint.files?.length > 0 && (
-                  <div className="attachments-list">
-                    {selectedComplaint.files.map((file) => {
-                      const isImage = file.type?.startsWith("image/");
-                      const isPdf = file.type === "application/pdf";
+                  <div className="attachments-grid">
+  {selectedComplaint.files.map((file) => {
+    const isImage = file.type?.startsWith("image/");
+    const isPdf = file.type === "application/pdf";
 
-                      return (
-                        <div key={file.id} className="attachment-item">
-                          <a
-                            href={file.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="attachment-pill"
-                          >
-                            {isImage && "عرض الصورة"}
-                            {isPdf && "فتح ملف PDF"}
-                            {!isImage && !isPdf && "تحميل الملف"}
-                          </a>
-                        </div>
-                      );
-                    })}
-                  </div>
+    if (isImage) {
+      return (
+        <a
+          key={file.id}
+          href={file.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="img-card"
+          title="فتح الصورة"
+        >
+          <img
+            src={file.url}
+            // alt="attachment"
+            onError={(e) => {
+               e.currentTarget.onerror = null;
+              e.currentTarget.src = "/image/logo.svg"; // حط صورة ثابتة عندك بالـ public
+            }}
+          />
+        </a>
+      );
+    }
+
+    if (isPdf) {
+      return (
+        <a
+          key={file.id}
+          href={file.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pdf-card"
+          title="فتح PDF"
+        >
+          <div className="pdf-badge">PDF</div>
+          <div className="pdf-text">فتح الملف</div>
+        </a>
+      );
+    }
+
+    return (
+      <a
+        key={file.id}
+        href={file.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="file-card"
+      >
+        تحميل الملف
+      </a>
+    );
+  })}
+</div>
+
+                  // <div className="attachments-list">
+                  //   {selectedComplaint.files.map((file) => {
+                  //     const isImage = file.type?.startsWith("image/");
+                  //     const isPdf = file.type === "application/pdf";
+
+                  //     return (
+                  //       <div key={file.id} className="attachment-item">
+                  //         <a
+                  //           href={file.url}
+                  //           target="_blank"
+                  //           rel="noopener noreferrer"
+                  //           className="attachment-pill"
+                  //         >
+                  //           {isImage && "عرض الصورة"}
+                  //           {isPdf && "فتح ملف PDF"}
+                  //           {!isImage && !isPdf && "تحميل الملف"}
+                  //         </a>
+                  //       </div>
+                  //     );
+                  //   })}
+                  // </div>
                 )}
               </div>
             </>

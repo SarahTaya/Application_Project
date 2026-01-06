@@ -9,7 +9,8 @@ import Dashboard from "../presentation/pages/dashboard/Dashboard";
 import AdminDashboard from "../presentation/pages/dashboard/AdminDashboard";
 import UsersPage from "../presentation/pages/dashboard/UsersPage";
 import EmployeesPage from "../presentation/pages/dashboard/EmployeesPage";
-
+import AdminDashboardStats from "../presentation/pages/dashboard/AdminAnalyticsDashboard";
+import TracingErrors from "../presentation/pages/dashboard/TracingErrors";
 // import Dashboard from "../presentation/pages/dashboard/Dashboard";
 
 export default function AppRoutes() {
@@ -24,6 +25,8 @@ export default function AppRoutes() {
         <Route path="/admin/complaints" element={<AdminDashboard />} />
         <Route path="/admin/users" element={<UsersPage />} />
         <Route path="/admin/employees" element={<EmployeesPage/>} />
+         <Route path="/admin/chart" element={<AdminDashboardStats/>} />
+          <Route path="/admin/errors" element={<TracingErrors/>} />
 
       {/* <Route path="/dashboard" element={<Dashboard />} /> */}
     </Routes>

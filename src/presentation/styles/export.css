@@ -1,0 +1,43 @@
+.exportMenu { position: relative; display: inline-block; }
+
+.exportDropdown{
+  position: absolute;
+  top: 110%;
+  right: 0;
+  min-width: 140px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+  overflow: hidden;
+  z-index: 50;
+}
+
+.exportDropdown button{
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 0;
+  text-align: right;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.exportDropdown button:hover{
+  background: #f5f7ff;
+}
+
+
+/* ///////////////////////////////////////////////////////////////////////// */
+.backup-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px){
+  .backup-grid{
+    grid-template-columns: 1fr;
+  }
+}

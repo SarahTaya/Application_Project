@@ -1,0 +1,120 @@
+.main_Admistratev{
+    height: 100vh;
+  
+    background-color: white;
+    
+}
+
+.devs-col{
+  height: calc(100vh - 80px); 
+  display: flex;
+  flex-direction: row;
+  direction: rtl; 
+  gap: 16px;
+  padding: 16px;
+}
+.data-box{
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+}
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.mainDev{
+height: 94%;
+width: 32%;
+margin:0px 5px;
+background-color: #f4e6d7;
+display: flex;
+flex-direction: column;
+border-radius: 15px;
+box-shadow: 0 1px 15px rgb(117, 117, 117);
+}
+.data-box::-webkit-scrollbar
+
+{
+  display: none;
+}
+.header{
+background-color: #f4e6d7;
+height: 15%;
+margin: 10px;
+display: flex;
+flex-direction: row;
+align-items: center;
+  justify-content: space-between; /* عنوان يمين وزر يسار (RTL) */
+  gap: 12px;
+  padding: 10px 14px;
+
+}
+.header h1{
+  margin: 0;
+  font-size: 22px;
+  color: #6b5a4a;
+}
+.body{
+    height:85% ;
+    background-color: #f4e6d7;
+}
+.header .buttonl{
+  width: 150px;
+}
+
+/* /////////////////////////////////////////////////// */
+.employee-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+justify-content: space-between;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.employee-info{
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  margin: 5px;
+  
+ 
+}
+.employee-info span{
+  margin: 4px;
+}
+
+
+
+
+/* الأزرار */
+.employee-actions {
+  display: flex;
+  align-items: center;
+ 
+}
+.danger-btn{
+  background-color: #f02b35;
+  height: 30px;
+  width: 50px;
+   border: none;
+   border-radius: 8px;
+   padding: 5px 14px;
+    color: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+
+
+.danger-btn:hover {
+  background: white;
+}

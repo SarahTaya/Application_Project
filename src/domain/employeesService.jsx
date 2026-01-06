@@ -1,4 +1,5 @@
 // src/domain/employeesService.js
+import { deleteCitizenApi, deleteEmployeeApi, geAllDepartmentsApi, getAllCitizensApi, getAllDepartmentsApi, getAllEmployeesApi } from "../data/dash/adminUsersApi";
 import { addEmployeeApi } from "../data/dash/dashApi";
 
 function mapEmployeeUser(user) {
@@ -40,4 +41,74 @@ export async function addEmployee(input) {
 
   const user = data.result?.user ?? data.user ?? data;
   return mapEmployeeUser(user);
+}
+////users/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function mapEmployee(raw) {
+  return {
+    id: raw.id,
+    serialNumber: raw.serial_number,
+    status: raw.status,
+    lastLoginAt: raw.last_login_at,
+
+    fullName: `${raw.user?.f_name ?? ""} ${raw.user?.l_name ?? ""}`.trim(),
+    phoneNumber: raw.user?.phone_number ?? "",
+
+    departmentName: raw.department?.name ?? "",
+    departmentId: raw.department?.id ?? null,
+  };
+}
+
+export async function getAllEmployees() {
+  const data = await getAllEmployeesApi();
+  const list = Array.isArray(data?.data) ? data.data : [];
+  return list.map(mapEmployee);
+}
+
+
+
+function mapCitizen(raw) {
+  return {
+    id: raw.id,
+    nationalNumber: raw.national_number,
+    email: raw.email,
+
+    fullName: `${raw.user?.f_name ?? ""} ${raw.user?.l_name ?? ""}`.trim(),
+    phoneNumber: raw.user?.phone_number ?? "",
+  };
+}
+
+export async function getAllCitizens() {
+  const data = await getAllCitizensApi();
+  const list = Array.isArray(data?.data) ? data.data : [];
+  return list.map(mapCitizen);
+}
+
+// ////////////////////////////////اقسااام///////////////////////////
+function mapDepartment(raw) {
+  return {
+    id: raw.id,
+    name: raw.name,
+    governmentEntityId: raw.government_entity_id,
+
+    // اسم الوزارة/الجهة العليا
+    governmentName: raw.governments?.name ?? "",
+    governmentId: raw.governments?.id ?? null,
+  };
+}
+
+export async function getAllDepartments() {
+  const data = await getAllDepartmentsApi();
+  const list = Array.isArray(data?.data) ? data.data : [];
+  return list.map(mapDepartment);
+}
+
+
+export async function deleteEmployee(employeeId) {
+  const res = await deleteEmployeeApi(employeeId);
+  return res.data;
+}
+
+export async function deleteCitizen(CitizenId) {
+  const res = await deleteCitizenApi(CitizenId);
+  return res.data;
 }

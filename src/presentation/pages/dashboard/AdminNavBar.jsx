@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import ThemeToggle from "../../../Theme/ThemeToggle";
 
 export default function AdminNavBar() {
   return (
@@ -21,11 +22,19 @@ export default function AdminNavBar() {
         </NavLink>
 
         <NavLink
-          to="/admin/employees"
+          to="/admin/chart"
           className="admin-nav__tab"
         >
-          الموظفين
+          الاحصائيات
         </NavLink>
+
+        <NavLink
+          to="/admin/errors"
+          className="admin-nav__tab"
+        >
+          الايرورات
+        </NavLink>
+      
       </div>
     </nav>
   );

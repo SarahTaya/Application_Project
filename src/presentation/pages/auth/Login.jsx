@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { loginEmployee } from "../../../domain/authService";
+import ThemeToggle from "../../../Theme/ThemeToggle";
 <FaEye />
 
 
@@ -42,11 +43,16 @@ export default function Login() {
     }
     return <div className="main">
         <div className="second-main">
+                              {/* زر التبديل */}
+      {/* <div style={{ padding: "16px" }}>
+        <ThemeToggle />
+      </div> */}
             <div className="form1">
 
                 <form autoComplete="off" onSubmit={handleSubmit} >
                     <div className="icon"><BiLogIn /></div>
                     <h1> LogIN</h1>
+      
                     <h4>please enter your S/N and password to continue</h4>
                     <div className="field">
                         <label htmlFor="1">  Serial Number: </label>
