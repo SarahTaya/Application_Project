@@ -50,10 +50,11 @@
 import { httpClient } from "../http/client";
 
 // تسجيل الدخول
-export async function loginApi({ serial_number, password }) {
+export async function loginApi({ serial_number, password, fcm_token = null }) {
   const res = await httpClient.post("login", {
     serial_number,
     password,
+     fcm_token,
   });
 
   // شكل الريسبونس عندك (حسب authService):

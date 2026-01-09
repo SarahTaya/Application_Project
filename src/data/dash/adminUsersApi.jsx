@@ -22,3 +22,9 @@ export function deleteEmployeeApi(employeeId) {
 export function deleteCitizenApi(CitizenId) {
   return httpClient.delete(`/citizens/${CitizenId}`);
 }
+
+// هيستوري
+export async function getComplaintHistoryApi(referenceNumber) {
+  const res = await httpClient.get(`complaints/history/${referenceNumber}`);
+  return res.data; // { status: "success", history: { versions: [...] } }
+}

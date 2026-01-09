@@ -1,70 +1,124 @@
-
-/* 
 :root {
-  --primary: #A67C68;
-  --secondary: #F5E5D3;
-  --brown: #8B5E3C;
-  --light: #FAF0E4;
-  --danger: #e63946;
-  --success: #4caf50;
+  --beige1: #f7f1e8;
+  --beige2: #E6D8C3;
+  --beige3: #FAF5EC;
+  --beige4: #E5D1BF;
+  --beige5: #FAF0E4;
+  --beige-100: #FEF7F0;
+  --beige-200: #E5E7EB;
+  --beige-300: #f3e7d6;
+  --beige-400: #e2d4c3;
+  --beige-500: #fff;
+  --beige-600: #ffffff;
+  --beige-700: #fff7eb;
+  --beige-800: #eee;
+  --beige-900: #ffefd5;
+  --beige-1000: #d2c2af;
+  --beige-1100: #b3a18c;
+  --beige-1200: #fdf4e9;
+  --beige-1300: #edd5b3;
+  --beige-1400: #9a7b58;
+  --beige-1500: #f4e6d7;
+  --beige-1600: #f7efe4;
+  --beige-1700: #d29b62;
+  --b-1: #f0e1cf;
+  --b-2: #e0d5c5;
 
 
 
-  --brown-100: #F2E6D9;
-  --brown-200: #E5D1BF;
-  --brown-300: #D4B8A1;
-  --brown-400: #C49F82;
-  --brown-500: #B58766;
-  --brown-600: #A67C68;
+  /* brown */
+  --brown-900: #b88a57;
+  --brown-800: #c97b35;
   --brown-700: #8B5E3C;
-  --brown-8000: #704B30;
-  --brown-900: #5A3D25;
-  --brown-medium-1: #A67C68;
-  --brown-medium-2: #916850;
-  --brown-medium-3: #7A5A45;
-  --brown-dark-1: #5A3D25;
-  --brown-dark-2: #4A2F1E;
-  --brown-dark-3: #3A2416;
-  --brown-dark-4: #2A1A0F;
+  --brown-600: #b48c5b;
+  --brown-500: #d48900;
+  --brown-400: #5a3410;
+  --brown-300: #8b5a2b;
+  --brown-200: #3c2a1a;
+  --brown-100: #4a3b2a;
+
+
+  /* other */
+  --white: white;
+  --white-1: #ddd;
+  --white-2: #f7f7fb;
+  --black: black;
+  --gray-2: #666;
+  --gray-1: #8b7a6a;
+  --gray-3: #6b5a4a;
+  --red-3: #7a1f1f;
+  --red-2: red;
+  --red-1: #c0392b;
+  --green-1: #35c48b;
+  --babywhite: #eef2ff;
+  --babyblue: #1f6feb;
+  --black2: black;
+  --white-3: white;
+  /*  */
 
 
 
-  --beige-100: #FEF7F0;
-  --beige-200: #FAF0E4;
-  --beige-300: #F3E3D0;
-  --beige-400: #EBD5BC;
-  --beige-500: #DFC4A4;
-  --beige-600: #C7A987;
-  --beige-700: #B08F6F;
 
 
-
-  --accent-gold: #D4B483;
-  --accent-olive: #8A7F5A;
-  --accent-cream: #FFF7EA;
-} */
-
-:root {
-  --beige-100: #FEF7F0;
---brown-700: #8B5E3C;
---brown-100: #F2E6D9;
-  --bg: #ffffff;
-  --text: #1a1a1a;
-  --primary: #A67C68;
-  --card: #f7f1e8;
-  --border: #e5e5e5;
 }
 
 [data-theme="dark"] {
-  --beige-100: #121212;
---brown-700: #2a2a2a;
---brown-100: #d2b48c;
-  --bg: #121212;
-  --text: #f5f5f5;
-  --primary: #d2b48c;
-  --card: #1e1e1e;
-  --border: #2a2a2a;
+  --beige1: #1e1e1e;
+  --beige2: #1e1e1e;
+  --beige3: #333333;
+  --beige4: #1e1e1e;
+  --beige5: #333333;
+  --beige-100: #333333;
+  --beige-200: #4a4138;
+  --beige-300: #262626;
+  --beige-400: #7a6a59;
+  --beige-500: #333333;
+  --beige-600: #1e1e1e;
+  --beige-700: #594d40;
+  --beige-800: #7a6a59;
+  --beige-900: #5e5244;
+  --beige-1000: #8a7864;
+  --beige-1100: #9b886f;
+  --beige-1200: #333333;
+  --beige-1300: #bdbdbd;
+  --beige-1400: #9b886f;
+  --beige-1500: #333333;
+  --beige-1600: #463d33;
+  --beige-1700: #ddb37b;
+  --beige-1800: #625446;
+  --b-1: #55483c;
+  --b-2: #685947;
+
+  /* brown */
+  --brown-900: #d1a774;
+  --brown-800: #d8a05b;
+  --brown-700: #8a7864;
+  --brown-600: #bdbdbd;
+  --brown-500: #e49d2f;
+  --brown-400: #9b886f;
+  --brown-300: #d6c8b7;
+  --brown-200: #bdbdbd;
+  --brown-100: #bdbdbd;
+
+  /* other */
+  --white: #f0e7db;
+  --white-1: #d6c8b7;
+  --white-2: #e4d7c8;
+  --black: #bdbdbd;
+  --gray-2: #8f8479;
+  --gray-1: #c1b2a0;
+  --gray-3: #958573;
+  --red-3: #cf6a6a;
+  --red-2: #e96565;
+  --red-1: #ee7060;
+  --babyblue: #bdbdbd;
+  --green-1: #53c994;
+  --babywhite: #625446;
+  --black2: black;
+  --white-3: #333333;
 }
+
+
 
 /* اختياري بس مفيد ليوحّد الخلفية والنص افتراضياً */
 /* body {

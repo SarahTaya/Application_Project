@@ -37,7 +37,7 @@ export default function TopLocationsBar({ data = [], height = 260 }) {
 
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 13 }}
             interval={0}
             height={60}
             tickMargin={10}
@@ -49,9 +49,7 @@ export default function TopLocationsBar({ data = [], height = 260 }) {
             labelFormatter={(label) => `الموقع: ${label}`}
           />
 
-          {/* أهم شغلتين:
-              1) fill شفاف/عادي
-              2) Cell لكل عمود لونه */}
+         
           <Bar dataKey="total" radius={[10, 10, 0, 0]} barSize={26}>
             {safe.map((_, i) => (
               <Cell key={i} fill={COLORS[i % COLORS.length]} />

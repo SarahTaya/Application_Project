@@ -14,6 +14,7 @@ import {
 } from "../../../domain/complaintsService";
 import { FaEdit } from "react-icons/fa";
 import { updateNote } from "../../../domain/complaintsService";
+import ThemeToggle from "../../../Theme/ThemeToggle";
 
 
 
@@ -440,6 +441,10 @@ setComplaints((prev) => {
 
   return (
     <div className="maindash">
+                  {/* زر التبديل */}
+              <div style={{ padding: "1px" }}>
+                <ThemeToggle />
+              </div>
       <div className="title">
         <div className="title1">
           <h1>ادارة الشكاوي الحكومية</h1>
@@ -447,7 +452,9 @@ setComplaints((prev) => {
         <div className="title2">
           <h4>ادارة وتتبع شكاوي المواطنين</h4>
         </div>
+                 
       </div>
+      
 
       <div className="complaint">
         {/* الفلاتر + الجدول */}

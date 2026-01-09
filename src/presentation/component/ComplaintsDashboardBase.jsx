@@ -2,10 +2,14 @@
 import { useEffect, useState } from "react";
 import "../styles/dashboard.css"; // عدّلي المسار حسب مشروعك
 import {
+  addEmployeeNote,
   deleteNote,
   getAllNotesForComplaint,
+  updateNote,
+  updateComplaintStatus,
 } from "../../domain/complaintsService";
-
+import { FaEdit } from "react-icons/fa";
+import ComplaintHistoryModal from "./history/ComplaintHistoryModal";
 export default function ComplaintsDashboardBase({
   pageTitle,
   pageSubtitle,
@@ -20,8 +24,145 @@ export default function ComplaintsDashboardBase({
   const [error, setError] = useState("");
   const [searchRef, setSearchRef] = useState("");
   const [searchStatus, setSearchStatus] = useState("");
-  const [notesMode, setNotesMode] = useState("mine"); // "mine" أو "all"
+
   const [allNotes, setAllNotes] = useState([]);
+  const [statusDraft, setStatusDraft] = useState("");
+  // جديد
+  const [isAddNoteOpen, setIsAddNoteOpen] = useState(false);
+  const [newNoteText, setNewNoteText] = useState("");
+  const [requestedToCitizen, setRequestedToCitizen] = useState(false);
+  const [notesMode, setNotesMode] = useState("all"); // ✅ default خلّيه all
+
+  const [isEditNoteOpen, setIsEditNoteOpen] = useState(false);
+  const [editNoteId, setEditNoteId] = useState(null);
+  const [editNoteText, setEditNoteText] = useState("");
+
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  function openAddNoteModal() {
+    if (!selectedComplaint) return;
+    setNewNoteText("");
+    setRequestedToCitizen(false);
+    setIsAddNoteOpen(true);
+  }
+
+  function closeAddNoteModal() {
+    setIsAddNoteOpen(false);
+  }
+
+  async function handleSubmitNewNote(e) {
+    e.preventDefault();
+    if (!selectedComplaint) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const updated = await addEmployeeNote({
+        complaintId: selectedComplaint.id,
+        note: newNoteText,
+        requested_to_citizen: requestedToCitizen ? 1 : 0,
+      });
+
+      // رجّع الشكوى المحددة محدثة (لحتى notes تتحدّث)
+      setSelectedComplaint(updated);
+
+      // حدّثها بقائمة الجدول كمان
+      setComplaints((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      const list = await getAllNotesForComplaint(updated.id);
+      setAllNotes(list);
+
+      closeAddNoteModal();
+    } catch (err) {
+      console.error(err);
+      alert("فشل إضافة الملاحظة، جرّب مرة تانية.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  // 
+  function openEditNoteModal(note) {
+    setEditNoteId(note.id);
+    setEditNoteText(note.text || "");
+    setIsEditNoteOpen(true);
+  }
+
+  function closeEditNoteModal() {
+    setIsEditNoteOpen(false);
+    setEditNoteId(null);
+    setEditNoteText("");
+  }
+
+  async function handleSubmitEditNote(e) {
+    e.preventDefault();
+    if (!editNoteId) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const updated = await updateNote({
+        noteId: editNoteId,
+        noteText: editNoteText,
+      });
+
+      // 1) إذا كنا بوضع all عدّل allNotes
+      setAllNotes((prev) =>
+        prev.map((n) => (n.id === updated.id ? { ...n, text: updated.text } : n))
+      );
+
+      // 2) عدّل notes داخل selectedComplaint (لأنه mine مبني عليها)
+      setSelectedComplaint((prev) => {
+        if (!prev) return prev;
+        const updatedNotes = (prev.notes || []).map((n) =>
+          n.id === updated.id ? { ...n, note: updated.text } : n
+        );
+        return { ...prev, notes: updatedNotes };
+      });
+
+      closeEditNoteModal();
+    } catch (err) {
+      console.error(err);
+      alert("فشل تعديل الملاحظة، جرّب مرة تانية.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  // حاااااالة
+  async function handleUpdateStatus(e) {
+    const newStatus = e.target.value;
+    setStatusDraft(newStatus);
+
+    if (!selectedComplaint) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const updated = await updateComplaintStatus({
+        complaintId: selectedComplaint.id,
+        status: newStatus,
+      });
+
+      setSelectedComplaint(updated);
+      setComplaints((prev) =>
+        prev.map((c) => (c.id === updated.id ? updated : c))
+      );
+    } catch (err) {
+      console.error(err);
+      alert("فشل تعديل الحالة");
+      setStatusDraft(selectedComplaint?.status || "");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  // جدديد
 
   // 🔹 تحميل الشكاوي أول ما نفوت على الصفحة
   useEffect(() => {
@@ -105,9 +246,25 @@ export default function ComplaintsDashboardBase({
   // 📝 اختيار شكوى من الجدول
   async function handleSelectComplaint(item) {
     setSelectedComplaint(item);
-    setNotesMode("mine"); // نرجع لملاحظاتي
-    setAllNotes([]);      // نفرّغ ملاحظات الكل القديمة
+    setStatusDraft(item.status || "");
+    setAllNotes([]);
+    setNotesMode("all"); // ✅ ضيف هالسطر
+
+    try {
+      setLoading(true);
+      setError("");
+      const list = await getAllNotesForComplaint(item.id);
+      setAllNotes(list);
+    } catch (err) {
+      console.error(err);
+      setError("فشل تحميل كل الملاحظات لهذه الشكوى");
+      setAllNotes([]);
+    } finally {
+      setLoading(false);
+    }
   }
+
+
 
   // 🗑 حذف ملاحظة
   async function handleDeleteNote(noteId) {
@@ -176,6 +333,8 @@ export default function ComplaintsDashboardBase({
     }
   }
 
+
+
   return (
     <div className="maindash">
       <div className="title">
@@ -219,7 +378,7 @@ export default function ComplaintsDashboardBase({
           </div>
 
           {/* الجدول */}
-          <div className="table-wrapper">  
+          <div className="table-wrapper">
             <table className="complaints-table">
               <thead>
                 <tr>
@@ -273,6 +432,22 @@ export default function ComplaintsDashboardBase({
               <p className="detail-citizen">
                 {selectedComplaint.nationalNumber}
               </p>
+              <div className="detail-section">
+                <select
+                  className="filter-select"
+                  value={statusDraft}
+                  onChange={handleUpdateStatus}
+                  disabled={!selectedComplaint || loading}
+                  title="تعديل حالة الشكوى"
+                >
+                  <option value="new">جديدة</option>
+                  <option value="processing">قيد المعالجة</option>
+                  <option value="need_more_info">تحتاج معلومات إضافية</option>
+                  <option value="rejected">مرفوضة</option>
+                  <option value="closed">مغلقة</option>
+                </select>
+              </div>
+
 
               <hr className="detail-divider" />
 
@@ -314,7 +489,7 @@ export default function ComplaintsDashboardBase({
               </div>
 
               {/* الملاحظات */}
-              <div className="detail-section">
+              {/* <div className="detail-section">
                 <div className="notes-header">
                   <h3 className="section-title">الملاحظات</h3>
 
@@ -367,10 +542,177 @@ export default function ComplaintsDashboardBase({
                     ))}
                   </ul>
                 )}
+              </div> */}
+
+              <div className="detail-section">
+                <h3 className="section-title">الملاحظات</h3>
+
+                <div className="notes-header">
+                  <div className="notes-actions">
+                    {/* <select
+                      className="notes-filter-select"
+                      value={notesMode}
+                      onChange={handleNotesModeChange}
+                      disabled={!selectedComplaint}
+                    >
+                      <option value="mine">ملاحظاتي على الشكوى</option>
+                      <option value="all">ملاحظات كل الموظفين</option>
+                    </select> */}
+
+                    <button
+                      type="button"
+                      className="add-note-btn"
+                      onClick={openAddNoteModal}
+                      disabled={!selectedComplaint}
+                      title={!selectedComplaint ? "اختار شكوى أولاً" : "إضافة ملاحظة"}
+                    >
+                      + إضافة ملاحظة
+                    </button>
+
+                    <button
+  type="button"
+  className="history-btn"
+  onClick={() => setIsHistoryOpen(true)}
+  disabled={!selectedComplaint?.reference}
+>
+  📜 سجل التغييرات
+</button>
+
+                  </div>
+                </div>
+
+                {/* ✅ مودال تعديل ملاحظة */}
+                {isEditNoteOpen && (
+                  <div className="modal-overlay" onClick={closeEditNoteModal}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                      <div className="modal-head">
+                        <h3 className="modal-title">تعديل ملاحظة</h3>
+                        <button type="button" className="modal-x" onClick={closeEditNoteModal}>
+                          ×
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSubmitEditNote} className="modal-body">
+                        <label className="modal-label">ID الملاحظة</label>
+                        <input className="modal-input" value={editNoteId ?? ""} disabled />
+
+                        <label className="modal-label">نص الملاحظة</label>
+                        <textarea
+                          className="modal-textarea"
+                          value={editNoteText}
+                          onChange={(e) => setEditNoteText(e.target.value)}
+                          required
+                        />
+
+                        <div className="modal-actions">
+                          <button type="button" className="modal-btn secondary" onClick={closeEditNoteModal}>
+                            إلغاء
+                          </button>
+                          <button type="submit" className="modal-btn primary" disabled={loading}>
+                            تأكيد التعديل
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                {/* ✅ مودال إضافة ملاحظة */}
+                {isAddNoteOpen && (
+                  <div className="modal-overlay" onClick={closeAddNoteModal}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                      <div className="modal-head">
+                        <h3 className="modal-title">إضافة ملاحظة</h3>
+                        <button type="button" className="modal-x" onClick={closeAddNoteModal}>
+                          ×
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSubmitNewNote} className="modal-body">
+                        <label className="modal-label">ID الشكوى</label>
+                        <input className="modal-input" value={selectedComplaint?.id ?? ""} disabled />
+
+                        <label className="modal-label">الملاحظة</label>
+                        <textarea
+                          className="modal-textarea"
+                          value={newNoteText}
+                          onChange={(e) => setNewNoteText(e.target.value)}
+                          placeholder="اكتب ملاحظتك ..."
+                          required
+                        />
+
+                        <label className="modal-check">
+                          <input
+                            type="checkbox"
+                            checked={requestedToCitizen}
+                            onChange={(e) => setRequestedToCitizen(e.target.checked)}
+                          />
+                          مطلوبة من المواطن (requested_to_citizen)
+                        </label>
+
+                        <div className="modal-actions">
+                          <button type="button" className="modal-btn secondary" onClick={closeAddNoteModal}>
+                            إلغاء
+                          </button>
+                          <button type="submit" className="modal-btn primary" disabled={loading}>
+                            حفظ
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                {!selectedComplaint ? (
+                  <p className="section-text">اختار شكوى أولاً لعرض الملاحظات</p>
+                ) : visibleNotes.length === 0 ? (
+                  <p className="section-text">
+                    {notesMode === "mine" ? "لا يوجد ملاحظات على هذه الشكوى" : "لا توجد ملاحظات لهذه الشكوى"}
+                  </p>
+                ) : (
+                  <ul className="notes-list">
+                    {allNotes.map((note) => (
+                      <li key={note.id} className="note-item">
+                        <div className="note-header">
+                          {note.employeeId && <span className="note-author">موظف رقم {note.employeeId}</span>}
+                          {note.createdAt && <span className="note-date">{note.createdAt}</span>}
+
+                          <button
+                            type="button"
+                            className="note-edit-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditNoteModal(note);
+                            }}
+                            title="تعديل الملاحظة"
+                          >
+                            <FaEdit />
+                          </button>
+
+                          <button
+                            type="button"
+                            className="note-delete-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteNote(note.id);
+                            }}
+                            title="حذف الملاحظة"
+                          >
+                            ×
+                          </button>
+                        </div>
+
+                        <p className="note-text">{note.text}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
+
+
               {/* الملفات */}
-              <div className="detail-section">
+              {/* <div className="detail-section">
                 <h3 className="section-title">الملفات المرفقة</h3>
                 {(!selectedComplaint.files ||
                   selectedComplaint.files.length === 0) && (
@@ -400,7 +742,75 @@ export default function ComplaintsDashboardBase({
                     })}
                   </div>
                 )}
+              </div> */}
+              <div className="detail-section">
+                <h3 className="section-title">الملفات المرفقة</h3>
+
+                {(!selectedComplaint.files || selectedComplaint.files.length === 0) && (
+                  <p className="section-text">لا توجد ملفات مرفقة</p>
+                )}
+
+                {selectedComplaint.files?.length > 0 && (
+                  <div className="attachments-grid">
+                    {selectedComplaint.files.map((file) => {
+                      const isImage = file.type?.startsWith("image/");
+                      const isPdf = file.type === "application/pdf";
+
+                      if (isImage) {
+                        return (
+                          <a
+                            key={file.id}
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="img-card"
+                            title="فتح الصورة"
+                          >
+                            <img
+                              src={file.url}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "/image/logo.svg";
+                              }}
+                            />
+                          </a>
+                        );
+                      }
+
+                      if (isPdf) {
+                        return (
+                          <a
+                            key={file.id}
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="pdf-card"
+                            title="فتح PDF"
+                          >
+                            <div className="pdf-badge">PDF</div>
+                            <div className="pdf-text">فتح الملف</div>
+                          </a>
+                        );
+                      }
+
+                      return (
+                        <a
+                          key={file.id}
+                          href={file.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="file-card"
+                        >
+                          تحميل الملف
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
+
+
+
             </>
           ) : (
             <p className="empty-details">
@@ -409,6 +819,12 @@ export default function ComplaintsDashboardBase({
           )}
         </div>
       </div>
+      <ComplaintHistoryModal
+  isOpen={isHistoryOpen}
+  onClose={() => setIsHistoryOpen(false)}
+  referenceNumber={selectedComplaint?.reference}
+/>
+
     </div>
   );
 }

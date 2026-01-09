@@ -133,7 +133,7 @@ export default function AdminAnalyticsDashboard() {
       label: d.label,     // جاهزة من الماب
       value: d.value,     // جاهزة من الماب
     }))}
-    topN={10}
+    topN={9}
   />
 </SectionCard>
 

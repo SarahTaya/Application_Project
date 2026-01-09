@@ -11,10 +11,13 @@ import UsersPage from "../presentation/pages/dashboard/UsersPage";
 import EmployeesPage from "../presentation/pages/dashboard/EmployeesPage";
 import AdminDashboardStats from "../presentation/pages/dashboard/AdminAnalyticsDashboard";
 import TracingErrors from "../presentation/pages/dashboard/TracingErrors";
+ import { ToastContainer } from 'react-toastify';
 // import Dashboard from "../presentation/pages/dashboard/Dashboard";
 
 export default function AppRoutes() {
   return (
+    <div>
+      <ToastContainer/>
     <Routes>
       <Route path="/" element={<Login />} />
        <Route path="/forget" element={<Forget />} />
@@ -30,5 +33,6 @@ export default function AppRoutes() {
 
       {/* <Route path="/dashboard" element={<Dashboard />} /> */}
     </Routes>
+    </div>
   );
 }

@@ -10,10 +10,10 @@ import {
 const COLORS = [
   "#c07922ff", "#7c3aed", "#10b981", "#f59e0b",
   "#ef4444", "#d0d406ff", "#8b5cf6", "#22c55e",
-  "#fb7185", "#64748b","#1f6feb",
+  "#fb7185", "#1f6feb",
 ];
 
-export default function DeptDonut({ items = [], topN = 10 }) {
+export default function DeptDonut({ items = [], topN = 9 }) {
   // ترتيب تنازلي
   const sorted = [...items].sort((a, b) => b.value - a.value);
 

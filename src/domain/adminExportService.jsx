@@ -22,6 +22,7 @@
 
 
 import { exportReportApi, getErrorLogsApi } from "../data/dash/adminExportApi";
+import { getComplaintHistoryApi } from "../data/dash/adminUsersApi";
 
 function guessFilename({ type, format }) {
   const ext = format === "pdf" ? "pdf" : "csv";
@@ -83,3 +84,58 @@ export async function getErrorLogs() {
   return list.map(mapTraceLog);
 }
 
+
+
+
+// هيستوري
+
+function formatShortDate(iso) {
+  if (!iso) return "-";
+  return iso.replace("T", " ").slice(0, 16);
+}
+
+function actionLabel(action, fieldName) {
+  // بدّل التسميات حسب ذوقك
+  switch (action) {
+    case "status_changed":
+      return "تعديل الحالة";
+    case "note_added":
+      return "إضافة ملاحظة";
+    case "note_deleted":
+      return "حذف ملاحظة";
+    case "note_updated":
+      return "تعديل ملاحظة";
+    case "note_requested_from_citizen":
+      return "طلب معلومات من المواطن";
+    default:
+      return fieldName ? `تغيير: ${fieldName}` : "تعديل";
+  }
+}
+
+export async function getComplaintHistory(referenceNumber) {
+  const data = await getComplaintHistoryApi(referenceNumber);
+
+  const versions = data?.history?.versions ?? [];
+
+  // نجهّزها للـ UI (شكل موحّد)
+  const mapped = versions
+    .map((v) => ({
+      id: v.id,
+      action: v.action,
+      actionLabel: actionLabel(v.action, v.field_name),
+      fieldName: v.field_name,
+      oldValue: v.old_value,
+      newValue: v.new_value,
+      createdAt: v.created_at,
+      createdAtText: formatShortDate(v.created_at),
+      userName: `${v.user?.f_name ?? ""} ${v.user?.l_name ?? ""}`.trim() || `User#${v.created_by ?? "-"}`,
+      userId: v.created_by ?? null,
+      version: v.version ?? null,
+      // snapshot مفيد إذا بدك لاحقاً
+      snapshotStatus: v.snapshot?.status ?? null,
+    }))
+    // الأحدث فوق
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+
+  return mapped;
+}

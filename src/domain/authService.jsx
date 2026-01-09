@@ -1,27 +1,68 @@
 import Cookies from 'universal-cookie';
 import { forgotpasswordApi, loginApi, resetpasswordApi, verifyOtpApi } from '../data/auth/authApi';
+import { enableWebNotifications } from '../firebase/notifications';
 const cookies = new Cookies();
-export async function loginEmployee({
-    serial_number,
-    password
-}) {
-    const data = await loginApi({ serial_number, password })
-    console.log("login response data =>", data);
 
-    const innerUser = data?.user?.user; 
-    const token = innerUser?.token;
-    const roleId = innerUser?.role_id;
 
-    if (!token) {
-        throw new Error("Token not found in response");
-    }
-    cookies.set("token", token);
-    // return data;
-    return {
-        roleId,
-        user: innerUser,
-    };
+export async function loginEmployee({ serial_number, password }) {
+  let fcmToken = null;
+
+  try {
+    fcmToken = await enableWebNotifications();
+    console.log("FCM TOKEN =", fcmToken);
+  } catch (e) {
+    console.warn("FCM disabled / not available", e);
+  }
+
+  const data = await loginApi({ serial_number, password, fcm_token: fcmToken });
+  console.log("login response data =>", data);
+
+  const innerUser = data?.user?.user;
+  const token = innerUser?.token;
+  const roleId = innerUser?.role_id;
+
+  if (!token) throw new Error("Token not found in response");
+
+  cookies.set("token", token);
+
+  return {
+    roleId,
+    user: innerUser,
+  };
 }
+
+
+// export async function loginEmployee({
+//     serial_number,
+//     password
+// }) {
+
+// let fcmToken = null;
+
+//   try {
+//     fcmToken = await enableWebNotifications();
+//     console.log("FCM TOKEN =", fcmToken);
+//   } catch (e) {
+//     console.warn("FCM disabled / not available", e);
+//   }
+
+//     const data = await loginApi({ serial_number, password })
+//     console.log("login response data =>", data);
+
+//     const innerUser = data?.user?.user; 
+//     const token = innerUser?.token;
+//     const roleId = innerUser?.role_id;
+
+//     if (!token) {
+//         throw new Error("Token not found in response");
+//     }
+//     cookies.set("token", token);
+//     // return data;
+//     return {
+//         roleId,
+//         user: innerUser,
+//     };
+// }
 
 
 

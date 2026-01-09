@@ -2,6 +2,12 @@ import { NavLink } from "react-router-dom";
 import ThemeToggle from "../../../Theme/ThemeToggle";
 
 export default function AdminNavBar() {
+
+
+
+
+
+
   return (
     <nav className="admin-nav">
       <div className="admin-nav__logo">لوحة تحكم الأدمن</div>
@@ -34,8 +40,19 @@ export default function AdminNavBar() {
         >
           الايرورات
         </NavLink>
+
+       
+
+                            {/* زر التبديل */}
+      <div style={{ padding: "1px" }}>
+        <ThemeToggle />
+      </div>
+
+
       
       </div>
+
+       
     </nav>
   );
 }

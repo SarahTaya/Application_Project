@@ -3,10 +3,11 @@ import { AiOutlineNumber } from "react-icons/ai";
 import { TbLockPassword } from "react-icons/tb";
 import { FaEye } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginEmployee } from "../../../domain/authService";
 import ThemeToggle from "../../../Theme/ThemeToggle";
+import { showErrorToast } from "../../../config/toastService";
 <FaEye />
 
 
@@ -15,13 +16,16 @@ export default function Login() {
     const [password, setPassword] = React.useState("");
     const [accept, setAccept] = React.useState(false);
     const [error, setError] = React.useState("");
-    const [loading, setLoading] = React.useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     async function handleSubmit(e) {
 
         e.preventDefault();
         setAccept(true);
+        setErrorMsg("");
+  setLoading(true);
 
         if (!serial_number || !password) {
             setError("الرجاء إدخال الرقم التسلسلي وكلمة المرور");
@@ -37,9 +41,25 @@ export default function Login() {
       navigate("/admindash"); 
     }
         } catch (err) {
-            console.error(err);
-            setError(err.message || "فشل تسجيل الدخول");
-        }
+    const status = err?.response?.status;
+    const msg =
+      err?.response?.data?.message ||
+      err?.message ||
+      "صار خطأ غير متوقع";
+
+    // هون بتطلع رسالة القفل/المحاولات الزايدة
+    if (status === 429) {
+      showErrorToast(msg); // مثال: "انتظر قبل المحاولة مجدداً..."
+    } else if (status === 401) {
+      setErrorMsg(msg); // مثال: "بيانات الدخول غير صحيحة"
+    } else {
+      setErrorMsg(msg);
+    }
+
+    console.error("login error:", status, err?.response?.data);
+  } finally {
+    setLoading(false);
+  }
     }
     return <div className="main">
         <div className="second-main">
